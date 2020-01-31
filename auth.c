@@ -917,7 +917,9 @@ subprocess(const char *tag, struct passwd *pw, const char *command,
 		/* Prepare a minimal environment for the child. */
 		envsize = 5;
 		child_env = xcalloc(sizeof(*child_env), envsize);
+#ifndef __ANDROID__
 		child_set_env(&child_env, &envsize, "PATH", _PATH_STDPATH);
+#endif
 		child_set_env(&child_env, &envsize, "USER", pw->pw_name);
 		child_set_env(&child_env, &envsize, "LOGNAME", pw->pw_name);
 		child_set_env(&child_env, &envsize, "HOME", pw->pw_dir);
