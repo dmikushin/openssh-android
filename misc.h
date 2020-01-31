@@ -90,6 +90,9 @@ int	 path_absolute(const char *);
 void	 sock_set_v6only(int);
 
 struct passwd *pwcopy(struct passwd *);
+#ifdef __ANDROID__
+struct passwd *pwdefault();
+#endif
 const char *ssh_gai_strerror(int);
 
 typedef struct arglist arglist;

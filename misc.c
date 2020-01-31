@@ -412,6 +412,28 @@ pwcopy(struct passwd *pw)
 	return copy;
 }
 
+/* 
+ * Get default user data.
+ */
+struct passwd *
+pwdefault()
+{
+	static struct passwd pw;
+	memset(&pw, 0, sizeof(struct passwd));
+	pw.pw_name = getenv("USER");
+	pw.pw_passwd = "";
+	pw.pw_uid = getuid();
+#ifdef HAVE_STRUCT_PASSWD_PW_GECOS
+	pw.pw_gecos = "";
+#endif
+#ifdef HAVE_STRUCT_PASSWD_PW_CLASS
+	pw.pw_class = "";
+#endif
+	pw.pw_dir = "/";
+	pw.pw_shell = _PATH_BSHELL;
+	return &pw;
+}
+
 /*
  * Convert ASCII string to TCP/IP port number.
  * Port must be >=0 and <=65535.
