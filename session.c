@@ -1962,8 +1962,10 @@ session_pty_req(struct ssh *ssh, Session *s)
 	if ((r = sshpkt_get_end(ssh)) != 0)
 		sshpkt_fatal(ssh, r, "%s: parse packet", __func__);
 
+#ifndef __ANDROID__
 	if (!use_privsep)
 		pty_setowner(s->pw, s->tty);
+#endif
 
 	/* Set window size from the packet. */
 	pty_change_window_size(s->ptyfd, s->row, s->col, s->xpixel, s->ypixel);
