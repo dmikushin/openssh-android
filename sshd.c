@@ -1903,6 +1903,7 @@ main(int ac, char **av)
 	if (test_flag)
 		exit(0);
 
+#ifndef __ANDROID__
 	/*
 	 * Clear out any supplemental groups we may have inherited.  This
 	 * prevents inadvertent creation of files with bad modes (in the
@@ -1912,6 +1913,7 @@ main(int ac, char **av)
 	 */
 	if (setgroups(0, NULL) < 0)
 		debug("setgroups() failed: %.200s", strerror(errno));
+#endif
 
 	if (rexec_flag) {
 		if (rexec_argc < 0)
