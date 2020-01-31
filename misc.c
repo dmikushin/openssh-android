@@ -1923,7 +1923,9 @@ safe_path(const char *name, struct stat *stp, const char *pw_dir,
 	char buf[PATH_MAX], homedir[PATH_MAX];
 	char *cp;
 	int comparehome = 0;
+#ifndef __ANDROID__
 	struct stat st;
+#endif
 
 	if (realpath(name, buf) == NULL) {
 		snprintf(err, errlen, "realpath %s failed: %s", name,
@@ -1937,12 +1939,14 @@ safe_path(const char *name, struct stat *stp, const char *pw_dir,
 		snprintf(err, errlen, "%s is not a regular file", buf);
 		return -1;
 	}
+#ifndef __ANDROID__
 	if ((!platform_sys_dir_uid(stp->st_uid) && stp->st_uid != uid) ||
 	    (stp->st_mode & 022) != 0) {
 		snprintf(err, errlen, "bad ownership or modes for file %s",
 		    buf);
 		return -1;
 	}
+#endif
 
 	/* for each component of the canonical path, walking upwards */
 	for (;;) {
@@ -1951,7 +1955,7 @@ safe_path(const char *name, struct stat *stp, const char *pw_dir,
 			return -1;
 		}
 		strlcpy(buf, cp, sizeof(buf));
-
+#ifndef __ANDROID__
 		if (stat(buf, &st) == -1 ||
 		    (!platform_sys_dir_uid(st.st_uid) && st.st_uid != uid) ||
 		    (st.st_mode & 022) != 0) {
@@ -1959,7 +1963,7 @@ safe_path(const char *name, struct stat *stp, const char *pw_dir,
 			    "bad ownership or modes for directory %s", buf);
 			return -1;
 		}
-
+#endif
 		/* If are past the homedir then we can stop */
 		if (comparehome && strcmp(homedir, buf) == 0)
 			break;
