@@ -744,8 +744,10 @@ do_login(struct ssh *ssh, Session *s, const char *command)
 {
 	socklen_t fromlen;
 	struct sockaddr_storage from;
+#ifndef __ANDROID__
 	struct passwd * pw = s->pw;
 	pid_t pid = getpid();
+#endif
 
 	/*
 	 * Get IP address of client. If the connection is not a socket, let
@@ -761,12 +763,14 @@ do_login(struct ssh *ssh, Session *s, const char *command)
 		}
 	}
 
+#ifndef __ANDROID__
 	/* Record that there was a login on that tty from the remote host. */
 	if (!use_privsep)
 		record_login(pid, s->tty, pw->pw_name, pw->pw_uid,
 		    session_get_remote_name_or_ip(ssh, utmp_len,
 		    options.use_dns),
 		    (struct sockaddr *)&from, fromlen);
+#endif
 
 #ifdef USE_PAM
 	/*
@@ -1025,7 +1029,6 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
 	/* Set basic environment. */
 	for (i = 0; i < s->num_env; i++)
 		child_set_env(&env, &envsize, s->env[i].name, s->env[i].val);
-
 	child_set_env(&env, &envsize, "USER", pw->pw_name);
 	child_set_env(&env, &envsize, "LOGNAME", pw->pw_name);
 #ifdef _AIX
@@ -2276,11 +2279,11 @@ session_pty_cleanup2(Session *s)
 		return;
 
 	debug("%s: session %d release %s", __func__, s->self, s->tty);
-
+#ifndef __ANDROID__
 	/* Record that the user has logged out. */
 	if (s->pid != 0)
 		record_logout(s->pid, s->tty, s->pw->pw_name);
-
+#endif
 	/* Release the pseudo-tty. */
 	if (getuid() == 0)
 		pty_release(s->tty);
