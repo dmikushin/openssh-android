@@ -411,8 +411,16 @@ struct winsize {
 
 /* Paths */
 
+#ifdef __ANDROID__
+#undef _PATH_BSHELL
+#endif
+
 #ifndef _PATH_BSHELL
+#ifdef __ANDROID__
+# define _PATH_BSHELL "/system/bin/bash"
+#else
 # define _PATH_BSHELL "/bin/sh"
+#endif
 #endif
 
 #ifdef USER_PATH
