@@ -12,7 +12,12 @@
  * called by a name other than "ssh" or "Secure Shell".
  */
 
+#ifdef __ANDROID__
+#define ETCDIR				"/system/etc"
+#undef SSHDIR
+#else
 #define ETCDIR				"/etc"
+#endif
 
 #ifndef SSHDIR
 #define SSHDIR				ETCDIR "/ssh"
