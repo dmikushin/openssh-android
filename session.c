@@ -933,13 +933,14 @@ read_etc_default_login(char ***env, u_int *envsize, uid_t uid)
 	if (tmpenv == NULL)
 		return;
 
+#ifndef __ANDROID__
 	if (uid == 0)
 		var = child_get_env(tmpenv, "SUPATH");
 	else
 		var = child_get_env(tmpenv, "PATH");
 	if (var != NULL)
 		child_set_env(env, envsize, "PATH", var);
-
+#endif
 	if ((var = child_get_env(tmpenv, "UMASK")) != NULL)
 		if (sscanf(var, "%5lo", &mask) == 1)
 			umask((mode_t)mask);
@@ -950,7 +951,7 @@ read_etc_default_login(char ***env, u_int *envsize, uid_t uid)
 }
 #endif /* HAVE_ETC_DEFAULT_LOGIN */
 
-#if defined(USE_PAM) || defined(HAVE_CYGWIN)
+#if defined(USE_PAM) || defined(HAVE_CYGWIN) || defined(__ANDROID__)
 static void
 copy_environment_blacklist(char **source, char ***env, u_int *envsize,
     const char *blacklist)
@@ -980,7 +981,7 @@ copy_environment_blacklist(char **source, char ***env, u_int *envsize,
 }
 #endif /* defined(USE_PAM) || defined(HAVE_CYGWIN) */
 
-#ifdef HAVE_CYGWIN
+#if defined(HAVE_CYGWIN) || defined(__ANDROID__)
 static void
 copy_environment(char **source, char ***env, u_int *envsize)
 {
@@ -1026,20 +1027,31 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
 	ssh_gssapi_do_child(&env, &envsize);
 #endif
 
+#ifdef __ANDROID__
+	/* Copy environment from the current process (sshd)
+	 environment
+	 */
+	copy_environment(environ, &env, &envsize);
+#endif
+
 	/* Set basic environment. */
 	for (i = 0; i < s->num_env; i++)
 		child_set_env(&env, &envsize, s->env[i].name, s->env[i].val);
+#ifndef __ANDROID__
 	child_set_env(&env, &envsize, "USER", pw->pw_name);
+#endif
 	child_set_env(&env, &envsize, "LOGNAME", pw->pw_name);
 #ifdef _AIX
 	child_set_env(&env, &envsize, "LOGIN", pw->pw_name);
 #endif
 	child_set_env(&env, &envsize, "HOME", pw->pw_dir);
 #ifdef HAVE_LOGIN_CAP
+#ifndef __ANDROID__
 	if (setusercontext(lc, pw, pw->pw_uid, LOGIN_SETPATH) < 0)
 		child_set_env(&env, &envsize, "PATH", _PATH_STDPATH);
 	else
 		child_set_env(&env, &envsize, "PATH", getenv("PATH"));
+#endif
 #else /* HAVE_LOGIN_CAP */
 # ifndef HAVE_CYGWIN
 	/*
@@ -1053,8 +1065,10 @@ do_setup_env(struct ssh *ssh, Session *s, const char *shell)
 	path = child_get_env(env, "PATH");
 #  endif /* HAVE_ETC_DEFAULT_LOGIN */
 	if (path == NULL || *path == '\0') {
+#ifndef __ANDROID__
 		child_set_env(&env, &envsize, "PATH",
 		    s->pw->pw_uid == 0 ?  SUPERUSER_PATH : _PATH_STDPATH);
+#endif
 	}
 # endif /* HAVE_CYGWIN */
 #endif /* HAVE_LOGIN_CAP */
