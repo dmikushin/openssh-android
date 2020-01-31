@@ -191,8 +191,13 @@ main(int argc, char **argv)
 	key_fd[i++] = open(_PATH_HOST_XMSS_KEY_FILE, O_RDONLY);
 	key_fd[i++] = open(_PATH_HOST_RSA_KEY_FILE, O_RDONLY);
 
-	if ((pw = getpwuid(getuid())) == NULL)
+	if ((pw = getpwuid(getuid())) == NULL) {
+#ifdef __ANDROID__
+		pw = pwdefault();
+#else
 		fatal("getpwuid failed");
+#endif
+	}
 	pw = pwcopy(pw);
 
 	permanently_set_uid(pw);

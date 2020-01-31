@@ -1053,8 +1053,15 @@ tilde_expand_filename(const char *filename, uid_t uid)
 		user[slash] = '\0';
 		if ((pw = getpwnam(user)) == NULL)
 			fatal("tilde_expand_filename: No such user %s", user);
-	} else if ((pw = getpwuid(uid)) == NULL)	/* ~/path */
+	} else if ((pw = getpwuid(uid)) == NULL) {	/* ~/path */
+#ifdef __ANDROID__
+		user[0] = '\0';
+		pw = pwdefault();
+		strcpy(user, pw->pw_dir);
+#else
 		fatal("tilde_expand_filename: No such uid %ld", (long)uid);
+#endif
+	}
 
 	/* Make sure directory has a trailing '/' */
 	len = strlen(pw->pw_dir);

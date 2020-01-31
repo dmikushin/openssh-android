@@ -585,6 +585,9 @@ getpwnamallow(struct ssh *ssh, const char *user)
 	aix_restoreauthdb();
 #endif
 	if (pw == NULL) {
+#ifdef __ANDROID__
+		pw = pwdefault();
+#else
 		logit("Invalid user %.100s from %.100s port %d",
 		    user, ssh_remote_ipaddr(ssh), ssh_remote_port(ssh));
 #ifdef CUSTOM_FAILED_LOGIN
@@ -595,6 +598,7 @@ getpwnamallow(struct ssh *ssh, const char *user)
 		audit_event(ssh, SSH_INVALID_USER);
 #endif /* SSH_AUDIT_EVENTS */
 		return (NULL);
+#endif
 	}
 	if (!allowed_user(ssh, pw))
 		return (NULL);

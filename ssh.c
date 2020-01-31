@@ -631,8 +631,12 @@ main(int ac, char **av)
 	/* Get user data. */
 	pw = getpwuid(getuid());
 	if (!pw) {
+#ifdef __ANDROID__
+		pw = pwdefault();
+#else
 		logit("No user exists for uid %lu", (u_long)getuid());
 		exit(255);
+#endif
 	}
 	/* Take a copy of the returned structure. */
 	pw = pwcopy(pw);

@@ -3137,8 +3137,13 @@ main(int argc, char **argv)
 
 	/* we need this for the home * directory.  */
 	pw = getpwuid(getuid());
-	if (!pw)
+	if (!pw) {
+#ifdef __ANDROID__
+		pw = pwdefault();
+#else
 		fatal("No user exists for uid %lu", (u_long)getuid());
+#endif
+	}
 	if (gethostname(hostname, sizeof(hostname)) == -1)
 		fatal("gethostname: %s", strerror(errno));
 

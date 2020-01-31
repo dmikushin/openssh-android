@@ -181,6 +181,7 @@
 #include "auth.h"
 #include "sshbuf.h"
 #include "ssherr.h"
+#include "misc.h"
 
 #ifdef HAVE_UTIL_H
 # include <util.h>
@@ -312,9 +313,14 @@ login_get_lastlog(struct logininfo *li, const uid_t uid)
 	 * wtmp_get_entry().)
 	 */
 	pw = getpwuid(uid);
-	if (pw == NULL)
+	if (pw == NULL) {
+#ifdef __ANDROID__
+		pw = pwdefault();
+#else
 		fatal("%s: Cannot find account for uid %ld", __func__,
 		    (long)uid);
+#endif
+	}
 
 	if (strlcpy(li->username, pw->pw_name, sizeof(li->username)) >=
 	    sizeof(li->username)) {
@@ -386,8 +392,12 @@ login_init_entry(struct logininfo *li, pid_t pid, const char *username,
 		strlcpy(li->username, username, sizeof(li->username));
 		pw = getpwnam(li->username);
 		if (pw == NULL) {
+#ifdef __ANDROID__
+			li->uid = 0;
+#else
 			fatal("%s: Cannot find user \"%s\"", __func__,
 			    li->username);
+#endif
 		}
 		li->uid = pw->pw_uid;
 	}

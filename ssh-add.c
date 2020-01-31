@@ -791,10 +791,14 @@ main(int argc, char **argv)
 		int count = 0;
 
 		if ((pw = getpwuid(getuid())) == NULL) {
+#ifdef __ANDROID__
+			pw = pwdefault();
+#else
 			fprintf(stderr, "No user found with uid %u\n",
 			    (u_int)getuid());
 			ret = 1;
 			goto done;
+#endif
 		}
 
 		for (i = 0; default_files[i]; i++) {
