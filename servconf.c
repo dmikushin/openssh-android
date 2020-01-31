@@ -451,9 +451,14 @@ fill_default_server_options(ServerOptions *options)
 
 	assemble_algorithms(options);
 
+#ifdef __ANDROID__
+	if (use_privsep == -1)
+		use_privsep = PRIVSEP_OFF;
+#else
 	/* Turn privilege separation and sandboxing on by default */
 	if (use_privsep == -1)
 		use_privsep = PRIVSEP_ON;
+#endif
 
 #define CLEAR_ON_NONE(v) \
 	do { \
