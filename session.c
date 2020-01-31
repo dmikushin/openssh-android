@@ -2620,9 +2620,14 @@ session_setup_x11fwd(struct ssh *ssh, Session *s)
 		    session_close_single_x11, 0);
 	}
 
+#ifdef __ANDROID__
+	if (getenv("HOSTNAME"))
+		strcpy(hostname, getenv("HOSTNAME"));
+#else
 	/* Set up a suitable value for the DISPLAY variable. */
 	if (gethostname(hostname, sizeof(hostname)) == -1)
 		fatal("gethostname: %.100s", strerror(errno));
+#endif
 	/*
 	 * auth_display must be used as the displayname when the
 	 * authorization entry is added with xauth(1).  This will be

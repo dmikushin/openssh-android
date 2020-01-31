@@ -3144,8 +3144,13 @@ main(int argc, char **argv)
 		fatal("No user exists for uid %lu", (u_long)getuid());
 #endif
 	}
+#ifdef __ANDROID__
+	if (getenv("HOSTNAME"))
+		strcpy(hostname, getenv("HOSTNAME"));
+#else
 	if (gethostname(hostname, sizeof(hostname)) == -1)
 		fatal("gethostname: %s", strerror(errno));
+#endif
 
 	sk_provider = getenv("SSH_SK_PROVIDER");
 
