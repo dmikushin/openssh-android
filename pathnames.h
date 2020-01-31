@@ -101,10 +101,18 @@
  * may need to be world-readable.  (This file is read by the daemon which is
  * running as root.)
  */
-#define _PATH_SSH_USER_PERMITTED_KEYS	_PATH_SSH_USER_DIR "/authorized_keys"
+#ifdef __ANDROID__
 
+#define _PATH_SSH_USER_PERMITTED_KEYS   ETCDIR SSHDIR "/authorized_keys"
+#define _PATH_SSH_USER_PERMITTED_KEYS2  _PATH_SSH_USER_DIR "/authorized_keys"
+
+#else
+
+#define _PATH_SSH_USER_PERMITTED_KEYS	_PATH_SSH_USER_DIR "/authorized_keys"
 /* backward compat for protocol v2 */
 #define _PATH_SSH_USER_PERMITTED_KEYS2	_PATH_SSH_USER_DIR "/authorized_keys2"
+
+#endif
 
 /*
  * Per-user and system-wide ssh "rc" files.  These files are executed with
