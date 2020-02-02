@@ -21,8 +21,8 @@ int getaddrinfo_android(
 {
 	if (!node)
 	{
-		fprintf(stderr, "getaddrinfo_android: Invalid argument \"node\"\n");
-		return EAI_FAIL;
+		// Forward the case of NULL node to the original getaddrinfo.
+		return getaddrinfo(node, service, hints, res);
 	}
 
 	if (!service)
