@@ -43,7 +43,7 @@ int getaddrinfo_android(
 		return EAI_FAIL;
 	}
 
-	char filename[] = "/tmp/XXXXXX";
+	char filename[] = "/data/local/tmp/XXXXXX";
 	int fd = mkstemp(filename);
 	if (fd < 1)
 	{
