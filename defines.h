@@ -409,6 +409,18 @@ struct winsize {
 # define howmany(x,y)	(((x)+((y)-1))/(y))
 #endif
 
+/* Alter the name of getaddrinfo to use Android-specific implementation */
+
+#define getaddrinfo getaddrinfo_android
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+int getaddrinfo_android(
+	const char* node, const char* service,
+	const struct addrinfo* hints, struct addrinfo** res);
+
 /* Paths */
 
 #ifdef __ANDROID__

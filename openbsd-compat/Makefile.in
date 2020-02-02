@@ -89,7 +89,8 @@ COMPAT=	arc4random.o \
 	kludge-fd_set.o \
 	openssl-compat.o \
 	libressl-api-compat.o \
-	xcrypt.o
+	xcrypt.o \
+	getaddrinfo.o
 
 PORTS=	port-aix.o \
 	port-irix.o \
