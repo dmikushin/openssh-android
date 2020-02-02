@@ -2,7 +2,7 @@
 
 OpenSSH is a complete implementation of the SSH protocol (version 2) for secure remote login, command execution and file transfer. It includes a client ``ssh`` and server ``sshd``, file transfer utilities ``scp`` and ``sftp`` as well as tools for key generation (``ssh-keygen``), run-time key storage (``ssh-agent``) and a number of supporting programs.
 
-This is a port of OpenBSD's [OpenSSH](https://openssh.com) to most Unix-like operating systems, including Linux, OS X and Cygwin done by [https://github.com/openssh/openssh-portable](https://github.com/openssh/openssh-portable), and further tailored to limited Android environment (adb shell). Android shell does not provide user names and account information, such as /etc/passwd. Furthermore, this version limits encryption protocols to internal implementations. As a result, a complex dependency on `libcrypto` is lifted off, and `ed25519` becomes the only supported (and still - the best one!) encryption protocol (that is, no DSA or RSA support). The low-level installation process involves access to the base system and therefore requires a bootloader with permissive recovery mode, such as [TWRP](https://github.com/TeamWin/Team-Win-Recovery-Project).
+This is a port of OpenBSD's [OpenSSH](https://openssh.com) to most Unix-like operating systems, including Linux, OS X and Cygwin done by [https://github.com/openssh/openssh-portable](https://github.com/openssh/openssh-portable), and further tailored to limited Android environment (adb shell). Android shell does not provide user names and account information, such as /etc/passwd. Furthermore, this version limits encryption protocols to internal implementations. As a result, a complex dependency on `libcrypto` is lifted off, and `ed25519` becomes the only supported (and still - the best one!) encryption protocol (that is, no DSA or RSA support). The low-level installation process involves access to the base system and therefore requires a bootloader with permissive recovery mode, such as [TWRP](https://github.com/TeamWin/Team-Win-Recovery-Project). Android-specific domain name resolution is delegated to an external `nslookup` executable.
 
 ## Documentation
 
@@ -37,7 +37,32 @@ cd build
 ../configure --prefix=$(pwd)/../install
 ```
 
+Make a small change into the `system(char*)` implementation:
+
+
+```patch
+--- a/src/process/system.c
++++ b/src/process/system.c
+@@ -32,7 +32,7 @@ int system(const char *cmd)
+        posix_spawnattr_setsigmask(&attr, &old);
+        posix_spawnattr_setsigdefault(&attr, &reset);
+        posix_spawnattr_setflags(&attr, POSIX_SPAWN_SETSIGDEF|POSIX_SPAWN_SETSIGMASK);
+-       ret = posix_spawn(&pid, "/bin/sh", 0, &attr,
++       ret = posix_spawn(&pid, "/system/bin/sh", 0, &attr,
+                (char *[]){"sh", "-c", (char *)cmd, 0}, __environ);
+        posix_spawnattr_destroy(&attr);
+
+```
+
+Then proceed to building and installation:
+
+```
+make -j12 && make install
+```
+
 * Build and install Bash 5.0, which is going to be used for the login shell as show here: https://github.com/dmikushin/bash-anrdoid
+
+* Build and install simplistic nslookup equivalent to be used as an external domain name resolution utility: https://github.com/dmikushin/nslookup-android
 
 * Build OpenSSH with minimum dependencies, statically linking against Musl:
 
