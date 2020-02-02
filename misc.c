@@ -429,7 +429,7 @@ pwdefault()
 #ifdef HAVE_STRUCT_PASSWD_PW_CLASS
 	pw.pw_class = "";
 #endif
-	pw.pw_dir = "/";
+	pw.pw_dir = "/data/sdcard/";
 	pw.pw_shell = _PATH_BSHELL;
 	return &pw;
 }
