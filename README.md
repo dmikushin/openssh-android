@@ -69,6 +69,7 @@ make -j12 && make install
 ```
 git clone https://github.com/dmikushin/openssh-android
 cd openssh-android
+autoconf
 mkdir build
 cd build
 LDFLAGS=-static CFLAGS="-D__ANDROID__ -O3 -fomit-frame-pointer -ffast-math" CC=$(pwd)/../../musl/install/bin/musl-gcc ../configure --prefix=$(pwd)/../install --host=arm-linux-gnueabi --without-zlib --without-openssl
