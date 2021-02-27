@@ -72,7 +72,14 @@ cd openssh-android
 autoconf
 mkdir build
 cd build
-LDFLAGS=-static CFLAGS="-D__ANDROID__ -O3 -fomit-frame-pointer -ffast-math" CC=$(pwd)/../../musl/install/bin/musl-gcc ../configure --prefix=$(pwd)/../install --host=arm-linux-gnueabi --without-zlib --without-openssl
+source /usr/local/djgpp/setenv
+LDFLAGS=-static CFLAGS="-D__ANDROID__ -O3 -fomit-frame-pointer -ffast-math" ../configure --prefix=$(pwd)/../install --host=i586-pc-msdosdjgpp --without-zlib --without-openssl
+```
+
+Currently configure fails due to a missing `sys/socket.h` header in DJGPP (do we need to find them in FreeDOS?):
+
+```
+configure: error: Cannot find a type to use in place of socklen_t
 ```
 
 ## Installation
